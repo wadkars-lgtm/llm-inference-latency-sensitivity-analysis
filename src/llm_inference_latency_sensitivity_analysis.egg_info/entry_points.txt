@@ -1,0 +1,2 @@
+[console_scripts]
+latency-sensitivity = llm_latency_anatomy.__main__:main

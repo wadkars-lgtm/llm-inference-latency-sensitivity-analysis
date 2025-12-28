@@ -1,0 +1,6 @@
+author_email = "wadkar.sameer@gmail.com"
+author_name = "Sameer Wadkar"
+package_name = "llm_latency_anatomy"
+project_name = "Latency collapse analysis on RTX 5070"
+project_short_description = "A kernel-level investigation of LLM latency collapse under long-context inference on RTX 5070 GPUs."
+project_slug = "latency-collapse-analysis-on-rtx-5070"

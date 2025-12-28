@@ -1,0 +1,14 @@
+nvidia-ml-py3
+transformers<5.0,>=4.40
+accelerate>=0.30
+matplotlib
+
+[dev]
+mypy[reports]
+pytest
+pytest-cov
+ruff
+uv
+pre-commit
+build
+angreal
