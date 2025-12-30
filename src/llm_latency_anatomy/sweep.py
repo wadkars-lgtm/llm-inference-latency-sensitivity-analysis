@@ -236,7 +236,7 @@ def _write_combined_seq_sweep_plots(out_csv: str, images_dir: str) -> None:
         plt.close(fig)
 
 
-def _write_all_combined_plots(out_csv: str, images_dir: str = 'results/sweeps/images') -> None:
+def _write_all_combined_plots(out_csv: str, images_dir: str = 'results/sweeps/nsys') -> None:
     _write_combined_batch_sweep_plots(out_csv, images_dir=images_dir)
     _write_combined_seq_sweep_plots(out_csv, images_dir=images_dir)
 
@@ -383,7 +383,7 @@ def run_sweep(
     print(f'\nWrote results to: {out_csv}')
 
     try:
-        _write_all_combined_plots(out_csv, images_dir='results/sweeps/images')
-        print('Wrote combined plots to: results/sweeps/images')
+        _write_all_combined_plots(out_csv, images_dir='results/sweeps/nsys')
+        print('Wrote combined plots to: results/sweeps/nsys')
     except Exception as e:
         print(f'[WARN] Plot generation failed: {e}')

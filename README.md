@@ -111,3 +111,106 @@ latency-sensitivity sweep `
 
 ## [Full Article](LATENCY_SENSITIVITY_ANALYSIS_ON_RTX_5070.md)
 
+## NSight Systems Profiling
+
+### 1. Short context + high concurrency
+
+seq_len = 128, batch = 32
+
+This represents the efficient, parallel regime.
+```powershell
+& "C:\Program Files\NVIDIA Corporation\Nsight Systems 2025.6.1\target-windows-x64\nsys.exe" profile `
+  --force-overwrite=true `
+  --output=results/nsys/qwen_s128_b32 `
+  --sample=none `
+  python -m llm_latency_anatomy.__main__ sweep `
+    --model Qwen/Qwen2.5-3B-Instruct `
+    --dtype fp16 `
+    --device cuda `
+    --seq 128 `
+    --batch-sizes 32 `
+    --gen-tokens 32 `
+    --warmup 3 `
+    --reps 7 `
+    --collapse-factor 2 `
+    --out results/sweeps/nsight/qwen_s128_b32.csv
+ ```
+
+
+```powershell
+& "C:\Program Files\NVIDIA Corporation\Nsight Systems 2025.6.1\host-windows-x64\nsys-ui.exe" `
+  "results\nsys\qwen_s128_b32.nsys-rep"
+```
+### 2. Long context + single request
+
+seq_len = 4096, batch = 1
+
+This represents the memory- and dependency-heavy regime.
+
+```powershell
+  & "C:\Program Files\NVIDIA Corporation\Nsight Systems 2025.6.1\target-windows-x64\nsys.exe" profile `
+  --force-overwrite=true `
+  --output=results/nsys/qwen_s4096_b1 `
+  --sample=none `
+  python -m llm_latency_anatomy.__main__ sweep `
+  --model Qwen/Qwen2.5-3B-Instruct `
+  --dtype fp16 `
+  --device cuda `
+  --seq 4096 `
+  --batch-sizes 1 `
+  --gen-tokens 32 `
+  --warmup 3 `
+  --reps 7 `
+  --collapse-factor 2 `
+  --out results/sweeps/nsight/qwen_s4096_b1.csv
+
+```
+
+```powershell
+& "C:\Program Files\NVIDIA Corporation\Nsight Systems 2025.6.1\host-windows-x64\nsys-ui.exe" `
+  "results\nsys\qwen_s4096_b1.nsys-rep"
+```
+
+## NCompute profiling
+
+### 1. For batched case (seq=128, batch=32):
+
+```powershell
+ncu --set=full `
+    --target-processes all `
+    --kernel-name regex:.*attention.* `
+    --launch-skip 3 `
+    --launch-count 1 `
+    --export results/ncu/qwen_s128_b32 `
+    python -m llm_latency_anatomy.__main__ sweep `
+      --model Qwen/Qwen2.5-3B-Instruct `
+      --dtype fp16 `
+      --device cuda `
+      --seq 128 `
+      --batch-sizes 32 `
+      --gen-tokens 32 `
+      --warmup 3 `
+      --reps 1 `
+      --out results/sweeps/ncompute/qwen_s128_b32.csv
+```
+
+### 2.And for long-context case (seq=4096, batch=1):
+
+```powershell
+ncu --set=full `
+    --target-processes all `
+    --kernel-name regex:.*attention.* `
+    --launch-skip 3 `
+    --launch-count 1 `
+    --export results/ncu/qwen_s4096_b1 `
+    python -m llm_latency_anatomy.__main__ sweep `
+      --model Qwen/Qwen2.5-3B-Instruct `
+      --dtype fp16 `
+      --device cuda `
+      --seq 4096 `
+      --batch-sizes 1 `
+      --gen-tokens 32 `
+      --warmup 3 `
+      --reps 1 `
+      --out --out results/sweeps/ncompute/qwen_s4096_b1.csv
+```

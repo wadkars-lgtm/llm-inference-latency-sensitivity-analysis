@@ -105,4 +105,4 @@ results/sweeps/
 results/nsys/
 results/*
 /results
-results/sweeps/llama31_3b_fp16_bs1.csv
+/results/nsys/
